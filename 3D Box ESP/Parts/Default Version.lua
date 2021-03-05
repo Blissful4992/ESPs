@@ -13,6 +13,17 @@ local Box_Transparency = 1 -- 1 Visible, 0 Not Visible
 
 local Autothickness = true -- Makes screen less encumbered
 
+local function NewLine()
+    local line = Drawing.new("Line")
+    line.Visible = false
+    line.From = Vector2.new(0, 0)
+    line.To = Vector2.new(1, 1)
+    line.Color = Box_Color
+    line.Thickness = Box_Thickness
+    line.Transparency = Box_Transparency
+    return line
+end
+
 --// Main Function:
 --[[
     Example: 
@@ -23,101 +34,20 @@ function ESP(object)
     local part = object
 
     --// Lines for 3D box (12)
-    local line1 = Drawing.new("Line")
-    line1.Visible = false
-    line1.From = Vector2.new(0, 0)
-    line1.To = Vector2.new(1, 1)
-    line1.Color = Box_Color
-    line1.Thickness = Box_Thickness
-    line1.Transparency = Box_Transparency
-
-    local line2 = Drawing.new("Line")
-    line2.Visible = false
-    line2.From = Vector2.new(0, 0)
-    line2.To = Vector2.new(1, 1)
-    line2.Color = Box_Color
-    line2.Thickness = Box_Thickness
-    line2.Transparency = Box_Transparency
-
-    local line3 = Drawing.new("Line")
-    line3.Visible = false
-    line3.From = Vector2.new(0, 0)
-    line3.To = Vector2.new(1, 1)
-    line3.Color = Box_Color
-    line3.Thickness = Box_Thickness
-    line3.Transparency = Box_Transparency
-
-    local line4 = Drawing.new("Line")
-    line4.Visible = false
-    line4.From = Vector2.new(0, 0)
-    line4.To = Vector2.new(1, 1)
-    line4.Color = Box_Color
-    line4.Thickness = Box_Thickness
-    line4.Transparency = Box_Transparency
-
-    local line5 = Drawing.new("Line")
-    line5.Visible = false
-    line5.From = Vector2.new(0, 0)
-    line5.To = Vector2.new(1, 1)
-    line5.Color = Box_Color
-    line5.Thickness = Box_Thickness
-    line5.Transparency = Box_Transparency
-
-    local line6 = Drawing.new("Line")
-    line6.Visible = false
-    line6.From = Vector2.new(0, 0)
-    line6.To = Vector2.new(1, 1)
-    line6.Color = Box_Color
-    line6.Thickness = Box_Thickness
-    line6.Transparency = Box_Transparency
-
-    local line7 = Drawing.new("Line")
-    line7.Visible = false
-    line7.From = Vector2.new(0, 0)
-    line7.To = Vector2.new(1, 1)
-    line7.Color = Box_Color
-    line7.Thickness = Box_Thickness
-    line7.Transparency = Box_Transparency
-
-    local line8 = Drawing.new("Line")
-    line8.Visible = false
-    line8.From = Vector2.new(0, 0)
-    line8.To = Vector2.new(1, 1)
-    line8.Color = Box_Color
-    line8.Thickness = Box_Thickness
-    line8.Transparency = Box_Transparency
-
-    local line9 = Drawing.new("Line")
-    line9.Visible = false
-    line9.From = Vector2.new(0, 0)
-    line9.To = Vector2.new(1, 1)
-    line9.Color = Box_Color
-    line9.Thickness = Box_Thickness
-    line9.Transparency = Box_Transparency
-
-    local line10 = Drawing.new("Line")
-    line10.Visible = false
-    line10.From = Vector2.new(0, 0)
-    line10.To = Vector2.new(1, 1)
-    line10.Color = Box_Color
-    line10.Thickness = Box_Thickness
-    line10.Transparency = Box_Transparency
-
-    local line11 = Drawing.new("Line")
-    line11.Visible = false
-    line11.From = Vector2.new(0, 0)
-    line11.To = Vector2.new(1, 1)
-    line11.Color = Box_Color
-    line11.Thickness = Box_Thickness
-    line11.Transparency = Box_Transparency
-
-    local line12 = Drawing.new("Line")
-    line12.Visible = false
-    line12.From = Vector2.new(0, 0)
-    line12.To = Vector2.new(1, 1)
-    line12.Color = Box_Color
-    line12.Thickness = Box_Thickness
-    line12.Transparency = Box_Transparency
+    local lines = {
+        line1 = NewLine(),
+        line2 = NewLine(),
+        line3 = NewLine(),
+        line4 = NewLine(),
+        line5 = NewLine(),
+        line6 = NewLine(),
+        line7 = NewLine(),
+        line8 = NewLine(),
+        line9 = NewLine(),
+        line10 = NewLine(),
+        line11 = NewLine(),
+        line12 = NewLine()
+    }
 
     --// Updates ESP (lines) in render loop
     local function Updater()
@@ -140,99 +70,63 @@ function ESP(object)
                 local Bottom4 = camera:WorldToViewportPoint((part.CFrame * CFrame.new(size_X, -size_Y, -size_Z)).p)
 
                 --// Top:
-                line1.From = Vector2.new(Top1.X, Top1.Y)
-                line1.To = Vector2.new(Top2.X, Top2.Y)
+                lines.line1.From = Vector2.new(Top1.X, Top1.Y)
+                lines.line1.To = Vector2.new(Top2.X, Top2.Y)
 
-                line2.From = Vector2.new(Top2.X, Top2.Y)
-                line2.To = Vector2.new(Top3.X, Top3.Y)
+                lines.line2.From = Vector2.new(Top2.X, Top2.Y)
+                lines.line2.To = Vector2.new(Top3.X, Top3.Y)
 
-                line3.From = Vector2.new(Top3.X, Top3.Y)
-                line3.To = Vector2.new(Top4.X, Top4.Y)
+                lines.line3.From = Vector2.new(Top3.X, Top3.Y)
+                lines.line3.To = Vector2.new(Top4.X, Top4.Y)
 
-                line4.From = Vector2.new(Top4.X, Top4.Y)
-                line4.To = Vector2.new(Top1.X, Top1.Y)
+                lines.line4.From = Vector2.new(Top4.X, Top4.Y)
+                lines.line4.To = Vector2.new(Top1.X, Top1.Y)
 
                 --//Bottom:
-                line5.From = Vector2.new(Bottom1.X, Bottom1.Y)
-                line5.To = Vector2.new(Bottom2.X, Bottom2.Y)
+                lines.line5.From = Vector2.new(Bottom1.X, Bottom1.Y)
+                lines.line5.To = Vector2.new(Bottom2.X, Bottom2.Y)
 
-                line6.From = Vector2.new(Bottom2.X, Bottom2.Y)
-                line6.To = Vector2.new(Bottom3.X, Bottom3.Y)
+                lines.line6.From = Vector2.new(Bottom2.X, Bottom2.Y)
+                lines.line6.To = Vector2.new(Bottom3.X, Bottom3.Y)
 
-                line7.From = Vector2.new(Bottom3.X, Bottom3.Y)
-                line7.To = Vector2.new(Bottom4.X, Bottom4.Y)
+                lines.line7.From = Vector2.new(Bottom3.X, Bottom3.Y)
+                lines.line7.To = Vector2.new(Bottom4.X, Bottom4.Y)
 
-                line8.From = Vector2.new(Bottom4.X, Bottom4.Y)
-                line8.To = Vector2.new(Bottom1.X, Bottom1.Y)
+                lines.line8.From = Vector2.new(Bottom4.X, Bottom4.Y)
+                lines.line8.To = Vector2.new(Bottom1.X, Bottom1.Y)
 
                 --//Sides:
-                line9.From = Vector2.new(Bottom1.X, Bottom1.Y)
-                line9.To = Vector2.new(Top1.X, Top1.Y)
+                lines.line9.From = Vector2.new(Bottom1.X, Bottom1.Y)
+                lines.line9.To = Vector2.new(Top1.X, Top1.Y)
 
-                line10.From = Vector2.new(Bottom2.X, Bottom2.Y)
-                line10.To = Vector2.new(Top2.X, Top2.Y)
+                lines.line10.From = Vector2.new(Bottom2.X, Bottom2.Y)
+                lines.line10.To = Vector2.new(Top2.X, Top2.Y)
 
-                line11.From = Vector2.new(Bottom3.X, Bottom3.Y)
-                line11.To = Vector2.new(Top3.X, Top3.Y)
+                lines.line11.From = Vector2.new(Bottom3.X, Bottom3.Y)
+                lines.line11.To = Vector2.new(Top3.X, Top3.Y)
 
-                line12.From = Vector2.new(Bottom4.X, Bottom4.Y)
-                line12.To = Vector2.new(Top4.X, Top4.Y)
+                lines.line12.From = Vector2.new(Bottom4.X, Bottom4.Y)
+                lines.line12.To = Vector2.new(Top4.X, Top4.Y)
 
                 if Autothickness then
                     local distance = (player.Character.HumanoidRootPart.Position - part.Position).magnitude
                     local value = math.clamp(1/distance*100, 0.1, 4) --0.1 is min thickness, 6 is max
-                    line1.Thickness = value
-                    line2.Thickness = value
-                    line3.Thickness = value
-                    line4.Thickness = value
-                    line5.Thickness = value
-                    line6.Thickness = value
-                    line7.Thickness = value
-                    line8.Thickness = value
-                    line9.Thickness = value
-                    line10.Thickness = value
-                    line11.Thickness = value
-                    line12.Thickness = value
+                    for u, x in pairs(lines) do
+                        x.Thickness = value
+                    end
                 else 
-                    line1.Thickness = Box_Thickness
-                    line2.Thickness = Box_Thickness
-                    line3.Thickness = Box_Thickness
-                    line4.Thickness = Box_Thickness
-                    line5.Thickness = Box_Thickness
-                    line6.Thickness = Box_Thickness
-                    line7.Thickness = Box_Thickness
-                    line8.Thickness = Box_Thickness
-                    line9.Thickness = Box_Thickness
-                    line10.Thickness = Box_Thickness
-                    line11.Thickness = Box_Thickness
-                    line12.Thickness = Box_Thickness
+                    for u, x in pairs(lines) do
+                        x.Thickness = Box_Thickness
+                    end
                 end
 
-                line1.Visible = true
-                line2.Visible = true
-                line3.Visible = true
-                line4.Visible = true
-                line5.Visible = true
-                line6.Visible = true
-                line7.Visible = true
-                line8.Visible = true
-                line9.Visible = true
-                line10.Visible = true
-                line11.Visible = true
-                line12.Visible = true
+                for u, x in pairs(lines) do
+                    x.Visible = true
+                end
             else 
-                line1.Visible = false
-                line2.Visible = false
-                line3.Visible = false
-                line4.Visible = false
-                line5.Visible = false
-                line6.Visible = false
-                line7.Visible = false
-                line8.Visible = false
-                line9.Visible = false
-                line10.Visible = false
-                line11.Visible = false
-                line12.Visible = false
+                for u, x in pairs(lines) do
+                    x.Visible = false
+                end
                 if part == nil or not part then
                     connection:Disconnect()
                 end
