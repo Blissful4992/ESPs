@@ -1,3 +1,4 @@
+```lua
 -- Made by Blissful#4992
 local plr = game.Players.LocalPlayer
 local camera = game.Workspace.CurrentCamera
@@ -296,3 +297,4 @@ game.Players.PlayerAdded:Connect(function(newplr) --Parameter gets the new playe
     end
     coroutine.wrap(ESP)()
 end)
+```
