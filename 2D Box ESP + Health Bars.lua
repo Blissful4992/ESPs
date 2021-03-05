@@ -1,4 +1,4 @@
-```
+-- Preview: https://cdn.discordapp.com/attachments/807887111667056680/815517605074698240/unknown.png
 -- Made by Blissful#4992
 local plr = game.Players.LocalPlayer
 local camera = game.Workspace.CurrentCamera
@@ -297,4 +297,3 @@ game.Players.PlayerAdded:Connect(function(newplr) --Parameter gets the new playe
     end
     coroutine.wrap(ESP)()
 end)
-```
