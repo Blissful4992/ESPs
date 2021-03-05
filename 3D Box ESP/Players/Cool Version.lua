@@ -1,4 +1,4 @@
--- Preview = https://gyazo.com/ab2250ff7206f3b86bc4f479d79f0644
+-- Preview = https://gyazo.com/ba33c85b4bfeb92963d0a5ec3ac8f27d
 --// Made by Blissful#4992
 --// Locals:
 local workspace = game:GetService("Workspace")
