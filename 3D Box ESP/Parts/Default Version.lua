@@ -30,7 +30,7 @@ end
     local Part = workspace.Part      
     ESP(Part)
 ]]
-function ESP(object)
+local function ESP(object)
     local part = object
 
     --// Lines for 3D box (12)
