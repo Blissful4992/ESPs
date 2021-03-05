@@ -1,4 +1,4 @@
-```lua
+```ruby
 -- Made by Blissful#4992
 local plr = game.Players.LocalPlayer
 local camera = game.Workspace.CurrentCamera
