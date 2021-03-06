@@ -202,7 +202,7 @@ for i, v in pairs(game:GetService("Players"):GetPlayers()) do
                         local e = 0
                         for u, x in pairs(RLeg) do
                             e=e+1
-                            if RRLegNames[e+1] ~= nil and v.Character:FindFirstChild(RLegNames[e+1]) ~= nil and v.Character:FindFirstChild(RLegNames[e+1]).Position ~= nil then
+                            if RLegNames[e+1] ~= nil and v.Character:FindFirstChild(RLegNames[e+1]) ~= nil and v.Character:FindFirstChild(RLegNames[e+1]).Position ~= nil then
                                 local pos1 = camera:WorldToViewportPoint(v.Character:FindFirstChild(RLegNames[e]).Position)
                                 local pos2 = camera:WorldToViewportPoint(v.Character:FindFirstChild(RLegNames[e+1]).Position)
                                 x.From = Vector2.new(pos1.X, pos1.Y)
