@@ -1,4 +1,4 @@
--- Preview: https://cdn.discordapp.com/attachments/807887111667056680/815517605074698240/unknown.png
+-- Preview: https://cdn.discordapp.com/attachments/807887111667056680/817712853519695892/Screenshot_1.png
 -- Made by Blissful#4992
 --// Settings:
 local Box_Color = Color3.fromRGB(255, 0, 0)
