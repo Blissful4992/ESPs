@@ -40,7 +40,7 @@ local function NewLine(thickness, color)
     line.Visible = false
     line.From = Vector2.new(0, 0)
     line.To = Vector2.new(0, 0)
-    line.Color = color
+    line.Color = color 
     line.Thickness = thickness
     line.Transparency = 1
     return line
@@ -105,7 +105,7 @@ local function ESP(plr)
                             library.tracer.From = camera.ViewportSize*0.5
                             library.blacktracer.From = camera.ViewportSize*0.5
                         elseif Settings.Tracer_Origin == "Bottom" then
-                            library.tracer.From = Vector2.new(camera.ViewportSize.X*0.5, camera.ViewportSize.Y)
+                            library.tracer.From = Vector2.new(camera.ViewportSize.X*0.5, camera.ViewportSize.Y) 
                             library.blacktracer.From = Vector2.new(camera.ViewportSize.X*0.5, camera.ViewportSize.Y)
                         end
                         if Settings.Tracer_FollowMouse then
@@ -130,17 +130,11 @@ local function ESP(plr)
 
                     library.healthbar.From = Vector2.new(HumPos.X - DistanceY - 4, HumPos.Y + DistanceY*2)
                     library.healthbar.To = Vector2.new(HumPos.X - DistanceY - 4, HumPos.Y - DistanceY*2)
-                    
-                    --//Health Color
-                    if plr.Character.Humanoid.Health < 20 then 
-                        library.greenhealth.Color = Color3.fromRGB(255, 0, 0)
-                    elseif plr.Character.Humanoid.Health < 50 and plr.Character.Humanoid.Health > 20 then
-                        library.greenhealth.Color = Color3.fromRGB(252, 144, 3)
-                    elseif plr.Character.Humanoid.Health < 80 and plr.Character.Humanoid.Health > 50 then
-                        library.greenhealth.Color = Color3.fromRGB(252, 227, 3)
-                    elseif plr.Character.Humanoid.Health <= 100 and plr.Character.Humanoid.Health > 80 then
-                        library.greenhealth.Color = Color3.fromRGB(0, 255, 0)
-                    end
+
+                    local green = Color3.fromRGB(0, 255, 0)
+                    local red = Color3.fromRGB(255, 0, 0)
+
+                    library.greenhealth.Color = red:lerp(green, plr.Character.Humanoid.Health/plr.Character.Humanoid.MaxHealth);
 
                     if Team_Check.TeamCheck then
                         if plr.TeamColor == player.TeamColor then
