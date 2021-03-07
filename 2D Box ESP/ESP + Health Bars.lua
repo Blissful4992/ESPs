@@ -1,22 +1,25 @@
 -- Preview: https://cdn.discordapp.com/attachments/807887111667056680/817712853519695892/Screenshot_1.png
 -- Made by Blissful#4992
---// Settings:
-local Box_Color = Color3.fromRGB(255, 0, 0)
-local Tracer_Color = Color3.fromRGB(255, 0, 0)
-local HealthBar_Color = Color3.fromRGB(0, 255, 0)
-
-local Tracer_Thickness = 1
-local Box_Thickness = 2
-
-local teamcheck = {
-    teamcheck = true,
-    green = Color3.fromRGB(161, 242, 19),
-    red = Color3.fromRGB(245, 69, 5)
+local Settings = {
+    Box_Color = Color3.fromRGB(255, 0, 0),
+    Tracer_Color = Color3.fromRGB(255, 0, 0),
+    Tracer_Thickness = 1,
+    Box_Thickness = 1,
+    Tracer_Origin = "Middle", -- Middle or Bottom if FollowMouse is on this won't matter...
+    Tracer_FollowMouse = true,
+    Tracers = true
 }
+local Team_Check = {
+    TeamCheck = false, -- if TeamColor is on this won't matter...
+    Green = Color3.fromRGB(0, 255, 0),
+    Red = Color3.fromRGB(255, 0, 0)
+}
+local TeamColor = true
 
---//Locals
-local plr = game.Players.LocalPlayer
-local camera = game.Workspace.CurrentCamera
+--// SEPARATION
+local player = game:GetService("Players").LocalPlayer
+local camera = game:GetService("Workspace").CurrentCamera
+local mouse = player:GetMouse()
 
 local function NewQuad(thickness, color)
     local quad = Drawing.new("Quad")
@@ -43,178 +46,138 @@ local function NewLine(thickness, color)
     return line
 end
 
-local black = Color3.fromRGB(0, 0, 0)
-
-for i, v in pairs(game.Players:GetChildren()) do
-    local library = {
-        --//Tracer and Black Tracer(black border)
-        blacktracer = NewLine(Tracer_Thickness*2, black),
-        tracer = NewLine(Tracer_Thickness, Tracer_Color),
-        --//Box and Black Box(black border)
-        black = NewQuad(Box_Thickness*2, black),
-        box = NewQuad(Box_Thickness, Box_Color),
-        --//Bar and Green Health Bar (part that moves up/down)
-        healthbar = NewLine(8, black),
-        greenhealth = NewLine(4, HealthBar_Color)
-    }
-
-    local function Visibility(state)
-        for u, x in pairs(library) do
-            x.Visible = state
-        end
+local function Visibility(state, lib)
+    for u, x in pairs(lib) do
+        x.Visible = state
     end
-
-    local function ESP()
-        local connection
-        connection = game:GetService("RunService").RenderStepped:Connect(function()
-            if v.Character ~= nil and v.Character:FindFirstChild("Humanoid") ~= nil and v.Character:FindFirstChild("HumanoidRootPart") ~= nil and v.Name ~= plr.Name and v.Character.Humanoid.Health > 0 and v.Character:FindFirstChild("Head") ~= nil then
-                local ScreenPos, OnScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
-                if OnScreen then
-                    local head = camera:WorldToViewportPoint(v.Character.Head.Position)
-                    local rootpos = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
-
-                    local ratio = math.clamp((Vector2.new(head.X, head.Y) - Vector2.new(rootpos.X, rootpos.Y)).magnitude, 2, math.huge)
-
-                    local head2 = camera:WorldToViewportPoint(Vector3.new(v.Character.Head.Position.X, v.Character.Head.Position.Y + 2, v.Character.Head.Position.Z))
-
-                    local root2 = camera:WorldToViewportPoint(Vector3.new(v.Character.Head.Position.X, v.Character.HumanoidRootPart.Position.Y - 3, v.Character.Head.Position.Z))
-
-                    library.black.PointA = Vector2.new(head2.X + ratio*1.6, head2.Y - ratio*0.05)
-                    library.black.PointB = Vector2.new(head2.X - ratio*1.6, head2.Y - ratio*0.05)
-                    library.black.PointC = Vector2.new(head2.X - ratio*1.6, root2.Y + ratio*0.5)
-                    library.black.PointD = Vector2.new(head2.X + ratio*1.6, root2.Y + ratio*0.5)
-
-                    library.box.PointA = Vector2.new(head2.X + ratio*1.6, head2.Y - ratio*0.05)
-                    library.box.PointB = Vector2.new(head2.X - ratio*1.6, head2.Y - ratio*0.05)
-                    library.box.PointC = Vector2.new(head2.X - ratio*1.6, root2.Y + ratio*0.5)
-                    library.box.PointD = Vector2.new(head2.X + ratio*1.6, root2.Y + ratio*0.5)
-
-                    library.tracer.To = Vector2.new(root2.X, root2.Y + ratio*0.5)
-                    library.tracer.From = Vector2.new(camera.ViewportSize.X*0.5, camera.ViewportSize.Y)
-
-                    library.blacktracer.To = Vector2.new(root2.X, root2.Y + ratio*0.5)
-                    library.blacktracer.From = Vector2.new(camera.ViewportSize.X*0.5, camera.ViewportSize.Y)
-
-                    local d = (Vector2.new(head2.X - ratio*1.8, head2.Y - ratio*0.05) - Vector2.new(root2.X - ratio*1.8, root2.Y + ratio*0.5)).magnitude
-                    local green = (100-v.Character.Humanoid.Health) *d /100
-
-                    library.greenhealth.Thickness = math.clamp(ratio/4, 1, 4)
-                    library.healthbar.Thickness = math.clamp(ratio * 1.2 / 4, 1.5, 6)
-
-                    library.healthbar.To = Vector2.new(head2.X - ratio*1.8, head2.Y - ratio*0.05)
-                    library.healthbar.From = Vector2.new(head2.X - ratio*1.8, root2.Y + ratio*0.5)
-
-                    library.greenhealth.To = Vector2.new(head2.X - ratio*1.8, head2.Y + green - ratio*0.05)
-                    library.greenhealth.From = Vector2.new(head2.X - ratio*1.8, root2.Y + ratio*0.5)
-
-                    if teamcheck.teamcheck == true then
-                        if v.TeamColor == plr.TeamColor then
-                            library.box.Color = teamcheck.green
-                            library.tracer.Color = teamcheck.green
-                        else 
-                            library.box.Color = teamcheck.red
-                            library.tracer.Color = teamcheck.red
-                        end
-                    end
-
-                    Visibility(true)
-                else 
-                    Visibility(false)
-                end
-            else 
-                Visibility(false)
-                if game.Players:FindFirstChild(v.Name) == nil then
-                    connection:Disconnect()
-                end
-            end
-        end)
-    end
-    coroutine.wrap(ESP)()
 end
 
-game.Players.PlayerAdded:Connect(function(newplr) --Parameter gets the new player that has been added
+local function ToColor3(col) --Function to convert, just cuz c;
+    local r = col.r --Red value
+    local g = col.g --Green value
+    local b = col.b --Blue value
+    return Color3.new(r,g,b); --Color3 datatype, made of the RGB inputs
+end
+
+local black = Color3.fromRGB(0, 0 ,0)
+local function ESP(plr)
     local library = {
         --//Tracer and Black Tracer(black border)
-        blacktracer = NewLine(Tracer_Thickness*2, black),
-        tracer = NewLine(Tracer_Thickness, Tracer_Color),
+        blacktracer = NewLine(Settings.Tracer_Thickness*2, black),
+        tracer = NewLine(Settings.Tracer_Thickness, Settings.Tracer_Color),
         --//Box and Black Box(black border)
-        black = NewQuad(Box_Thickness*2, black),
-        box = NewQuad(Box_Thickness, Box_Color),
+        black = NewQuad(Settings.Box_Thickness*2, black),
+        box = NewQuad(Settings.Box_Thickness, Settings.Box_Color),
         --//Bar and Green Health Bar (part that moves up/down)
-        healthbar = NewLine(8, black),
-        greenhealth = NewLine(4, HealthBar_Color)
+        healthbar = NewLine(3, black),
+        greenhealth = NewLine(1.5, black)
     }
 
-    local function Visibility(state)
+    local function Colorize(color)
         for u, x in pairs(library) do
-            x.Visible = state
+            if x ~= library.healthbar and x ~= library.greenhealth and x ~= library.blacktracer and x ~= library.black then
+                x.Color = color
+            end
         end
     end
 
-    local function ESP()
+    local function Updater()
         local connection
         connection = game:GetService("RunService").RenderStepped:Connect(function()
-            if newplr.Character ~= nil and newplr.Character:FindFirstChild("Humanoid") ~= nil and newplr.Character:FindFirstChild("HumanoidRootPart") ~= nil and newplr.Name ~= plr.Name and newplr.Character.Humanoid.Health > 0 and newplr.Character:FindFirstChild("Head") ~= nil then
-                local ScreenPos, OnScreen = camera:WorldToViewportPoint(newplr.Character.HumanoidRootPart.Position)
+            if plr.Character ~= nil and plr.Character:FindFirstChild("Humanoid") ~= nil and plr.Character:FindFirstChild("HumanoidRootPart") ~= nil and plr.Character.Humanoid.Health > 0 and plr.Character:FindFirstChild("Head") ~= nil then
+                local HumPos, OnScreen = camera:WorldToViewportPoint(plr.Character.HumanoidRootPart.Position)
                 if OnScreen then
-                    local head = camera:WorldToViewportPoint(newplr.Character.Head.Position)
-                    local rootpos = camera:WorldToViewportPoint(newplr.Character.HumanoidRootPart.Position)
+                    local head = camera:WorldToViewportPoint(plr.Character.Head.Position)
+                    local DistanceY = math.clamp((Vector2.new(head.X, head.Y) - Vector2.new(HumPos.X, HumPos.Y)).magnitude, 2, math.huge)
+                    
+                    local function Size(item)
+                        item.PointA = Vector2.new(HumPos.X + DistanceY, HumPos.Y - DistanceY*2)
+                        item.PointB = Vector2.new(HumPos.X - DistanceY, HumPos.Y - DistanceY*2)
+                        item.PointC = Vector2.new(HumPos.X - DistanceY, HumPos.Y + DistanceY*2)
+                        item.PointD = Vector2.new(HumPos.X + DistanceY, HumPos.Y + DistanceY*2)
+                    end
+                    Size(library.box)
+                    Size(library.black)
 
-                    local ratio = math.clamp((Vector2.new(head.X, head.Y) - Vector2.new(rootpos.X, rootpos.Y)).magnitude, 2, math.huge)
-
-                    local head2 = camera:WorldToViewportPoint(Vector3.new(newplr.Character.Head.Position.X, newplr.Character.Head.Position.Y + 2, newplr.Character.Head.Position.Z))
-
-                    local root2 = camera:WorldToViewportPoint(Vector3.new(newplr.Character.Head.Position.X, newplr.Character.HumanoidRootPart.Position.Y - 3, newplr.Character.Head.Position.Z))
-
-                    library.black.PointA = Vector2.new(head2.X + ratio*1.6, head2.Y - ratio*0.05)
-                    library.black.PointB = Vector2.new(head2.X - ratio*1.6, head2.Y - ratio*0.05)
-                    library.black.PointC = Vector2.new(head2.X - ratio*1.6, root2.Y + ratio*0.5)
-                    library.black.PointD = Vector2.new(head2.X + ratio*1.6, root2.Y + ratio*0.5)
-
-                    library.box.PointA = Vector2.new(head2.X + ratio*1.6, head2.Y - ratio*0.05)
-                    library.box.PointB = Vector2.new(head2.X - ratio*1.6, head2.Y - ratio*0.05)
-                    library.box.PointC = Vector2.new(head2.X - ratio*1.6, root2.Y + ratio*0.5)
-                    library.box.PointD = Vector2.new(head2.X + ratio*1.6, root2.Y + ratio*0.5)
-
-                    library.tracer.To = Vector2.new(root2.X, root2.Y + ratio*0.5)
-                    library.tracer.From = Vector2.new(camera.ViewportSize.X*0.5, camera.ViewportSize.Y)
-
-                    library.blacktracer.To = Vector2.new(root2.X, root2.Y + ratio*0.5)
-                    library.blacktracer.From = Vector2.new(camera.ViewportSize.X*0.5, camera.ViewportSize.Y)
-
-                    local d = (Vector2.new(head2.X - ratio*1.8, head2.Y - ratio*0.05) - Vector2.new(root2.X - ratio*1.8, root2.Y + ratio*0.5)).magnitude
-                    local green = (100-newplr.Character.Humanoid.Health) *d /100
-
-                    library.greenhealth.Thickness = math.clamp(ratio/4, 1, 4)
-                    library.healthbar.Thickness = math.clamp(ratio * 1.2 / 4, 1.5, 6)
-
-                    library.healthbar.To = Vector2.new(head2.X - ratio*1.8, head2.Y - ratio*0.05)
-                    library.healthbar.From = Vector2.new(head2.X - ratio*1.8, root2.Y + ratio*0.5)
-
-                    library.greenhealth.To = Vector2.new(head2.X - ratio*1.8, head2.Y + green - ratio*0.05)
-                    library.greenhealth.From = Vector2.new(head2.X - ratio*1.8, root2.Y + ratio*0.5)
-
-                    if teamcheck.teamcheck == true then
-                        if newplr.TeamColor == plr.TeamColor then
-                            library.box.Color = teamcheck.green
-                            library.tracer.Color = teamcheck.green
-                        else 
-                            library.box.Color = teamcheck.red
-                            library.tracer.Color = teamcheck.red
+                    --//Tracer 
+                    if Settings.Tracers then
+                        if Settings.Tracer_Origin == "Middle" then
+                            library.tracer.From = camera.ViewportSize*0.5
+                            library.blacktracer.From = camera.ViewportSize*0.5
+                        elseif Settings.Tracer_Origin == "Bottom" then
+                            library.tracer.From = Vector2.new(camera.ViewportSize.X*0.5, camera.ViewportSize.Y)
+                            library.blacktracer.From = Vector2.new(camera.ViewportSize.X*0.5, camera.ViewportSize.Y)
                         end
+                        if Settings.Tracer_FollowMouse then
+                            library.tracer.From = Vector2.new(mouse.X, mouse.Y+36)
+                            library.blacktracer.From = Vector2.new(mouse.X, mouse.Y+36)
+                        end
+                        library.tracer.To = Vector2.new(HumPos.X, HumPos.Y + DistanceY*2)
+                        library.blacktracer.To = Vector2.new(HumPos.X, HumPos.Y + DistanceY*2)
+                    else 
+                        library.tracer.From = Vector2.new(0, 0)
+                        library.blacktracer.From = Vector2.new(0, 0)
+                        library.tracer.To = Vector2.new(0, 0)
+                        library.blacktracer.To = Vector2.new(0, 02)
                     end
 
-                    Visibility(true)
+                    --// Health Bar
+                    local d = (Vector2.new(HumPos.X - DistanceY, HumPos.Y - DistanceY*2) - Vector2.new(HumPos.X - DistanceY, HumPos.Y + DistanceY*2)).magnitude 
+                    local healthoffset = plr.Character.Humanoid.Health/plr.Character.Humanoid.MaxHealth * d
+
+                    library.greenhealth.From = Vector2.new(HumPos.X - DistanceY - 4, HumPos.Y + DistanceY*2)
+                    library.greenhealth.To = Vector2.new(HumPos.X - DistanceY - 4, HumPos.Y + DistanceY*2 - healthoffset)
+
+                    library.healthbar.From = Vector2.new(HumPos.X - DistanceY - 4, HumPos.Y + DistanceY*2)
+                    library.healthbar.To = Vector2.new(HumPos.X - DistanceY - 4, HumPos.Y - DistanceY*2)
+                    
+                    --//Health Color
+                    if plr.Character.Humanoid.Health < 20 then 
+                        library.greenhealth.Color = Color3.fromRGB(255, 0, 0)
+                    elseif plr.Character.Humanoid.Health < 50 and plr.Character.Humanoid.Health > 20 then
+                        library.greenhealth.Color = Color3.fromRGB(252, 144, 3)
+                    elseif plr.Character.Humanoid.Health < 80 and plr.Character.Humanoid.Health > 50 then
+                        library.greenhealth.Color = Color3.fromRGB(252, 227, 3)
+                    elseif plr.Character.Humanoid.Health <= 100 and plr.Character.Humanoid.Health > 80 then
+                        library.greenhealth.Color = Color3.fromRGB(0, 255, 0)
+                    end
+
+                    if Team_Check.TeamCheck then
+                        if plr.TeamColor == player.TeamColor then
+                            Colorize(Team_Check.Green)
+                        else 
+                            Colorize(Team_Check.Red)
+                        end
+                    else 
+                        library.tracer.Color = Settings.Tracer_Color
+                        library.box.Color = Settings.Box_Color
+                    end
+                    if TeamColor == true then
+                        Colorize(plr.TeamColor.Color)
+                    end
+                    Visibility(true, library)
                 else 
-                    Visibility(false)
+                    Visibility(false, library)
                 end
             else 
-                Visibility(false)
-                if game.Players:FindFirstChild(newplr.Name) == nil then
+                Visibility(false, library)
+                if game.Players:FindFirstChild(plr.Name) == nil then
                     connection:Disconnect()
                 end
             end
         end)
     end
-    coroutine.wrap(ESP)()
+    coroutine.wrap(Updater)()
+end
+
+for i, v in pairs(game:GetService("Players"):GetPlayers()) do
+    if v.Name ~= player.Name then
+        coroutine.wrap(ESP)(v)
+    end
+end
+
+game.Players.PlayerAdded:Connect(function(newplr)
+    if newplr.Name ~= player.Name then
+        coroutine.wrap(ESP)(newplr)
+    end
 end)
