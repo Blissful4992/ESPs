@@ -1,4 +1,5 @@
 -- Preview: https://cdn.discordapp.com/attachments/807887111667056680/820258191224340490/chams.png
+-- Made by Blissful#4992
 local Settings = {
     TeamCheck = true, -- Overules Color
     Red = Color3.fromRGB(255, 0, 0),
