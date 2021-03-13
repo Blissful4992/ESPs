@@ -123,6 +123,9 @@ local function ESP(object, plr)
                 end
                 if game.Players:FindFirstChild(plr.Name) == nil then
                     connection:Disconnect()
+                    for u, x in pairs(quads) do
+                        x:Remove()
+                    end
                 end
             end
         end)
@@ -135,7 +138,7 @@ for i, v in pairs(game:GetService("Players"):GetPlayers()) do
         --if v.Name ~= player.Name then
             for u, x in pairs(v.Character:GetChildren()) do
                 if x:IsA("MeshPart") or x.Name == "Head" then
-                    coroutine.wrap(ESP)(x, v)
+                    ESP(x, v)
                 end
             end
         --end
@@ -147,7 +150,7 @@ game.Players.PlayerAdded:Connect(function(newplr)
         if newplr.Name ~= player.Name then
             for u, x in pairs(newplr.Character:GetChildren()) do
                 if x:IsA("MeshPart") or x.Name == "Head" then
-                    coroutine.wrap(ESP)(x, newplr)
+                    ESP(x, newplr)
                 end
             end
         end
