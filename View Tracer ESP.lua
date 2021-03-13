@@ -1,3 +1,5 @@
+-- Preview: https://gyazo.com/02cfb4aa8659ba5f6ee67a90514cc34d
+-- Made by Blissful#4992
 local Settings = {
     Color = Color3.fromRGB(255, 203, 138), -- Color of the line
     Thickness = 1, -- Thickness of the line (Overruled by AutoThickness if activated)
