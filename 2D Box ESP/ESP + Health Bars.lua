@@ -5,7 +5,7 @@ local Settings = {
     Tracer_Color = Color3.fromRGB(255, 0, 0),
     Tracer_Thickness = 1,
     Box_Thickness = 1,
-    Tracer_Origin = "Middle", -- Middle or Bottom if FollowMouse is on this won't matter...
+    Tracer_Origin = "Bottom", -- Middle or Bottom if FollowMouse is on this won't matter...
     Tracer_FollowMouse = false,
     Tracers = true
 }
