@@ -49,7 +49,7 @@ local function ESP(object, plr)
     local function Updater()
         local connection
         connection = game:GetService("RunService").RenderStepped:Connect(function()
-            if plr.Character ~= nil and plr.Character:FindFirstChild(object.Name) ~= nil then
+            if plr.Character ~= nil and plr.Character:FindFirstChild("HumanoidRootPart") ~= nil and plr.Character.Humanoid.Health > 0 and plr.Character:FindFirstChild(object.Name) ~= nil then
                 local partpos, onscreen = camera:WorldToViewportPoint(part.Position)
                 if onscreen then
                     local size_X = part.Size.X/2
@@ -123,9 +123,6 @@ local function ESP(object, plr)
                 end
                 if game.Players:FindFirstChild(plr.Name) == nil then
                     connection:Disconnect()
-                    for u, x in pairs(quads) do
-                        x:Remove()
-                    end
                 end
             end
         end)
@@ -135,21 +132,23 @@ end
 
 for i, v in pairs(game:GetService("Players"):GetPlayers()) do
     spawn(function()
-        --if v.Name ~= player.Name then
+        if v.Name ~= player.Name then
+            repeat wait() until v.Character ~= nil and v.Character:FindFirstChild("Humanoid") ~= nil and v.Character:FindFirstChild("HumanoidRootPart") ~= nil and v.Character.Humanoid.Health > 0 and v.Character:FindFirstChild("Head") ~= nil
             for u, x in pairs(v.Character:GetChildren()) do
-                if x:IsA("MeshPart") or x.Name == "Head" then
+                if x:IsA("MeshPart") or x.Name == "Head" or x.Name == "Left Arm" or x.Name == "Right Arm" or x.Name == "Right Leg" or x.Name == "Left Leg" or x.Name == "Torso" then
                     ESP(x, v)
                 end
             end
-        --end
+        end
     end)
 end
 
 game.Players.PlayerAdded:Connect(function(newplr)
     spawn(function()
         if newplr.Name ~= player.Name then
+            repeat wait() until newplr.Character ~= nil and newplr.Character:FindFirstChild("Humanoid") ~= nil and newplr.Character:FindFirstChild("HumanoidRootPart") ~= nil and newplr.Character.Humanoid.Health > 0 and newplr.Character:FindFirstChild("Head") ~= nil
             for u, x in pairs(newplr.Character:GetChildren()) do
-                if x:IsA("MeshPart") or x.Name == "Head" then
+                if x:IsA("MeshPart") or x.Name == "Head" or x.Name == "Left Arm" or x.Name == "Right Arm" or x.Name == "Right Leg" or x.Name == "Left Leg" or x.Name == "Torso" then
                     ESP(x, newplr)
                 end
             end
