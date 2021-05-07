@@ -4,23 +4,6 @@ local Player = game:GetService("Players").LocalPlayer
 local Camera = game:GetService("Workspace").CurrentCamera
 local Mouse = Player:GetMouse()
 
-local function Dist(pointA, pointB) -- magnitude errors for some reason  : (
-    return math.sqrt(math.pow(pointA.X - pointB.X, 2) + math.pow(pointA.Y - pointB.Y, 2))
-end
-
-local function GetClosest(points, dest)
-    local min  = math.huge 
-    local closest = nil
-    for _,v in pairs(points) do
-        local dist = Dist(v, dest)
-        if dist < min then
-            min = dist
-            closest = v
-        end
-    end
-    return closest
-end
-
 local function DrawESP(plr)
     local Box = Drawing.new("Quad")
     Box.Visible = false
