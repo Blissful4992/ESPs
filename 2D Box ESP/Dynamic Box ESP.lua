@@ -11,7 +11,7 @@ local function DrawESP(plr)
     Box.PointC = Vector2.new(0, 0)
     Box.PointD = Vector2.new(0, 0)
     Box.Color = Color3.fromRGB(255, 255, 255)
-    Box.Thickness = 2
+    Box.Thickness = 1
     Box.Transparency = 1
 
     local function Update()
