@@ -1,9 +1,10 @@
-local LERPLIB = {} do
+local CIELUV = {} do
 	
 	local clamp = math.clamp
 	local C3 = Color3.new
 	local black = C3(0, 0, 0)
 
+	-- Convert from linear RGB to scaled CIELUV
 	local function RgbToLuv13(c)
 		local r, g, b = c.r, c.g, c.b
 		-- Apply inverse gamma correction
@@ -22,10 +23,11 @@ local LERPLIB = {} do
 		end
 	end
 
-	function LERPLIB:Lerp(c0, c1)
+	function CIELUV:Lerp(c0, c1)
 		local l0, u0, v0 = RgbToLuv13(c0)
 		local l1, u1, v1 = RgbToLuv13(c1)
 
+		-- The inputs aren't needed anymore, so don't drag out their lifetimes
 		c0, c1 = nil, nil
 
 		return function(t)
@@ -37,6 +39,7 @@ local LERPLIB = {} do
 			local u = ((1 - t)*u0 + t*u1)/l + 0.19783
 			local v = ((1 - t)*v0 + t*v1)/l + 0.46832
 
+			-- CIELUV->XYZ
 			local y = (l + 16)/116
 			y = y > 0.206896551724137931 and y*y*y or 0.12841854934601665*y - 0.01771290335807126
 			local x = y*u/v
@@ -47,7 +50,7 @@ local LERPLIB = {} do
 			local g = -2.1800940*x + 1.8757561*y + 0.0415175*z
 			local b =  0.1253477*x - 0.2040211*y + 1.0569959*z
 
-			-- Adjust for the lowest out of bounds component
+			-- Adjust for the lowest out-of-bounds component
 			if r < 0 and r < g and r < b then
 				r, g, b = 0, g - r, b - r
 			elseif g < 0 and g < b then
@@ -66,4 +69,4 @@ local LERPLIB = {} do
 	end
 end
 
-return LERPLIB
+return CIELUV
