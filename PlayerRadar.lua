@@ -18,7 +18,7 @@ local function NewCircle(Transparency, Color, Radius, Filled, Thickness)
 end
 
 local RadarInfo = {
-    Position = Vector2.new(200, 200),
+    Position = Camera.ViewportSize/2,
     Radius = 100,
     Scale = 1, -- Determinant factor on the effect of the relative position for the 2D integration
     RadarBack = Color3.fromRGB(10, 10, 10),
@@ -61,7 +61,8 @@ local function PlaceDot(plr)
                 local relx, rely = GetRelative(plr.Character.PrimaryPart.Position)
                 local newpos = RadarInfo.Position - Vector2.new(relx * scale, rely * scale) 
 
-                if (newpos - RadarInfo.Position).magnitude < RadarInfo.Radius-2 then      
+                if (newpos - RadarInfo.Position).magnitude < RadarInfo.Radius-2 then 
+                    PlayerDot.Radius = 3     
                     PlayerDot.Position = newpos
 
                     PlayerDot.Color = RadarInfo.PlayerDot
@@ -75,7 +76,12 @@ local function PlaceDot(plr)
 
                     PlayerDot.Visible = true
                 else 
-                    PlayerDot.Visible = false
+                    local dist = (RadarInfo.Position - newpos).magnitude
+                    local calc = (RadarInfo.Position - newpos).unit * (dist - RadarInfo.Radius)
+                    local inside = Vector2.new(newpos.X + calc.X, newpos.Y + calc.Y)
+                    PlayerDot.Radius = 2
+                    PlayerDot.Position = inside
+                    PlayerDot.Visible = true
                 end
             else 
                 PlayerDot.Visible = false
