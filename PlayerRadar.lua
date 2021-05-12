@@ -4,6 +4,9 @@ local Player = Players.LocalPlayer
 local Camera = game:service("Workspace").CurrentCamera
 local RS = game:service("RunService")
 
+local LerpColorModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/Blissful4992/ESPs/main/LerpColorModule.lua"))()
+local HealthBarLerp = LerpColorModule:Lerp(Color3.fromRGB(255, 0, 0), Color3.fromRGB(0, 255, 0))
+
 local function NewCircle(Transparency, Color, Radius, Filled, Thickness)
     local c = Drawing.new("Circle")
     c.Transparency = Transparency
@@ -27,6 +30,7 @@ local RadarInfo = {
     PlayerDot = Color3.fromRGB(60, 170, 255),
     Team = Color3.fromRGB(0, 255, 0),
     Enemy = Color3.fromRGB(255, 0, 0),
+    Health_Color = true,
     Team_Check = true
 }
 
@@ -39,8 +43,9 @@ RadarBorder.Visible = true
 RadarBorder.Position = RadarInfo.Position
 
 local function GetRelative(pos)
-    if Player.Character ~= nil and Player.Character.PrimaryPart ~= nil then
-        local pmpart = Player.Character.PrimaryPart
+    local char = Player.Character
+    if char ~= nil and char.PrimaryPart ~= nil then
+        local pmpart = char.PrimaryPart
         local camerapos = Vector3.new(Camera.CFrame.Position.X, pmpart.Position.Y, Camera.CFrame.Position.Z)
         local newcf = CFrame.new(pmpart.Position, camerapos)
         local r = newcf:PointToObjectSpace(pos)
@@ -56,24 +61,16 @@ local function PlaceDot(plr)
     local function Update()
         local c 
         c = game:service("RunService").RenderStepped:Connect(function()
-            if plr.Character and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character.PrimaryPart ~= nil and plr.Character:FindFirstChildOfClass("Humanoid").Health > 0 then
+            local char = plr.Character
+            if char and char:FindFirstChildOfClass("Humanoid") and char.PrimaryPart ~= nil and char:FindFirstChildOfClass("Humanoid").Health > 0 then
+                local hum = char:FindFirstChildOfClass("Humanoid")
                 local scale = RadarInfo.Scale
-                local relx, rely = GetRelative(plr.Character.PrimaryPart.Position)
+                local relx, rely = GetRelative(char.PrimaryPart.Position)
                 local newpos = RadarInfo.Position - Vector2.new(relx * scale, rely * scale) 
-
+                
                 if (newpos - RadarInfo.Position).magnitude < RadarInfo.Radius-2 then 
-                    PlayerDot.Radius = 3     
+                    PlayerDot.Radius = 3   
                     PlayerDot.Position = newpos
-
-                    PlayerDot.Color = RadarInfo.PlayerDot
-                    if RadarInfo.Team_Check then
-                        if plr.TeamColor == Player.TeamColor then
-                            PlayerDot.Color = RadarInfo.Team
-                        else
-                            PlayerDot.Color = RadarInfo.Enemy
-                        end
-                    end
-
                     PlayerDot.Visible = true
                 else 
                     local dist = (RadarInfo.Position - newpos).magnitude
@@ -82,6 +79,19 @@ local function PlaceDot(plr)
                     PlayerDot.Radius = 2
                     PlayerDot.Position = inside
                     PlayerDot.Visible = true
+                end
+
+                PlayerDot.Color = RadarInfo.PlayerDot
+                if RadarInfo.Team_Check then
+                    if plr.TeamColor == Player.TeamColor then
+                        PlayerDot.Color = RadarInfo.Team
+                    else
+                        PlayerDot.Color = RadarInfo.Enemy
+                    end
+                end
+
+                if RadarInfo.Health_Color then
+                    PlayerDot.Color = HealthBarLerp(hum.Health / hum.MaxHealth)
                 end
             else 
                 PlayerDot.Visible = false
