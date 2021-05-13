@@ -6,6 +6,8 @@ local Camera = game:service("Workspace").CurrentCamera
 local RS = game:service("RunService")
 local UIS = game:service("UserInputService")
 
+repeat wait() until Player.Character ~= nil and Player.Character.PrimaryPart ~= nil
+
 local LerpColorModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/Blissful4992/ESPs/main/LerpColorModule.lua"))()
 local HealthBarLerp = LerpColorModule:Lerp(Color3.fromRGB(255, 0, 0), Color3.fromRGB(0, 255, 0))
 
