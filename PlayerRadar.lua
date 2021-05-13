@@ -158,10 +158,12 @@ coroutine.wrap(function()
 end)()
 
 -- Draggable
+local inset = game:service("GuiService"):GetGuiInset()
+
 local dragging = false
 local offset = Vector2.new(0, 0)
 UIS.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 and (Vector2.new(Mouse.X, Mouse.Y) - RadarInfo.Position).magnitude < RadarInfo.Radius then
+    if input.UserInputType == Enum.UserInputType.MouseButton1 and (Vector2.new(Mouse.X, Mouse.Y + inset.Y) - RadarInfo.Position).magnitude < RadarInfo.Radius then
         offset = RadarInfo.Position - Vector2.new(Mouse.X, Mouse.Y)
         dragging = true
     end
@@ -174,8 +176,15 @@ UIS.InputEnded:Connect(function(input)
 end)
 
 coroutine.wrap(function()
+    local dot = NewCircle(1, Color3.fromRGB(255, 255, 255), 3, true, 1)
     local c 
     c = game:service("RunService").RenderStepped:Connect(function()
+        if (Vector2.new(Mouse.X, Mouse.Y + inset.Y) - RadarInfo.Position).magnitude < RadarInfo.Radius then
+            dot.Position = Vector2.new(Mouse.X, Mouse.Y + inset.Y)
+            dot.Visible = true
+        else 
+            dot.Visible = false
+        end
         if dragging then
             RadarInfo.Position = Vector2.new(Mouse.X, Mouse.Y) + offset
         end
