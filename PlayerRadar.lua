@@ -1,8 +1,10 @@
 -- Made by Blissful#4992
 local Players = game:service("Players")
 local Player = Players.LocalPlayer
+local Mouse = Player:GetMouse()
 local Camera = game:service("Workspace").CurrentCamera
 local RS = game:service("RunService")
+local UIS = game:service("UserInputService")
 
 local LerpColorModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/Blissful4992/ESPs/main/LerpColorModule.lua"))()
 local HealthBarLerp = LerpColorModule:Lerp(Color3.fromRGB(255, 0, 0), Color3.fromRGB(0, 255, 0))
@@ -21,7 +23,7 @@ local function NewCircle(Transparency, Color, Radius, Filled, Thickness)
 end
 
 local RadarInfo = {
-    Position = Camera.ViewportSize/2,
+    Position = Vector2.new(200, 200),
     Radius = 100,
     Scale = 1, -- Determinant factor on the effect of the relative position for the 2D integration
     RadarBack = Color3.fromRGB(10, 10, 10),
@@ -150,6 +152,31 @@ coroutine.wrap(function()
         RadarBorder.Position = RadarInfo.Position
         RadarBorder.Radius = RadarInfo.Radius
         RadarBorder.Color = RadarInfo.RadarBorder
+    end)
+end)()
+
+-- Draggable
+local dragging = false
+local offset = Vector2.new(0, 0)
+UIS.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 and (Vector2.new(Mouse.X, Mouse.Y) - RadarInfo.Position).magnitude < RadarInfo.Radius then
+        offset = RadarInfo.Position - Vector2.new(Mouse.X, Mouse.Y)
+        dragging = true
+    end
+end)
+
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+coroutine.wrap(function()
+    local c 
+    c = game:service("RunService").RenderStepped:Connect(function()
+        if dragging then
+            RadarInfo.Position = Vector2.new(Mouse.X, Mouse.Y) + offset
+        end
     end)
 end)()
 
