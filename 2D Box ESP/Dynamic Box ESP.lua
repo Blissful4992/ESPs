@@ -25,7 +25,7 @@ local function DrawESP(plr)
                     for _,v in pairs(plr.Character:GetChildren()) do
                         if v:IsA("BasePart") then
                             c = c + 1
-                            local p = Camera:WorldToViewportPoint(v.Position)
+                            local p, vis = Camera:WorldToViewportPoint(v.Position)
                             if v == plr.Character.PrimaryPart then
                                 p, vis = Camera:WorldToViewportPoint((v.CFrame * CFrame.new(0, 0, -v.Size.Z)).p)
                             elseif v.Name == "Head" then
