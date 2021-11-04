@@ -1,53 +1,50 @@
-local Library = {}
+local Library = {};
 
-local Camera = workspace.CurrentCamera
-local ToScreen = Camera.WorldToViewportPoint
+local Camera = workspace.CurrentCamera;
+local ToScreen = Camera.WorldToViewportPoint;
 
-local RS = game:GetService("RunService")
+local RS = game:GetService("RunService");
 
-local nVector3 = Vector3.new
-local nVector2 = Vector2.new
-local nDrawing = Drawing.new
-local nColor   = Color3.fromRGB
-local nCFrame = CFrame.new
-local nCFAngles = CFrame.Angles
+local nVector3 = Vector3.new;
+local nVector2 = Vector2.new;
+local nDrawing = Drawing.new;
+local nColor   = Color3.fromRGB;
+local nCFrame = CFrame.new;
+local nCFAngles = CFrame.Angles;
 
-local rad = math.rad
-local pi = math.pi
-local round = math.round
+local rad = math.rad;
+local pi = math.pi;
+local round = math.round;
 
-local Insert = table.insert
-local Char = string.char
-local Random = math.random
-local Seed = math.randomseed
-local Time = os.time
+local Insert = table.insert;
+local Char = string.char;
+local Random = math.random;
+local Seed = math.randomseed;
+local Time = os.time;
 
-local charset = {}
+local charset = {};
 
-for i = 48,  57 do Insert(charset, Char(i)) end
-for i = 65,  90 do Insert(charset, Char(i)) end
-for i = 97, 122 do Insert(charset, Char(i)) end
+for i = 48,  57 do Insert(charset, Char(i)) end;
+for i = 65,  90 do Insert(charset, Char(i)) end;
+for i = 97, 122 do Insert(charset, Char(i)) end;
 
 local function random_string(length)
-    Seed(Time())
+    Seed(Time());
 
     if length > 0 then
-        return random_string(length - 1) .. charset[Random(1, #charset)]
+        return random_string(length - 1) .. charset[Random(1, #charset)];
     else
-        return ""
-    end
-end
+        return "";
+    end;
+end;
 
 local function checkCamView(pos)
-    local cameraToPos = (pos - Camera.CFrame.Position).Unit
-    local cameraLook = Camera.CFrame.LookVector
-
-    return cameraToPos:Dot(cameraLook) > 0
+    return ((pos - Camera.CFrame.Position).Unit):Dot(Camera.CFrame.LookVector) > 0;
 end
 
 function Library:New3DLine()
     local _line = {
-        Visible      = false,
+        Visible      = false;
         ZIndex       = 1;
         Transparency = 1;
         Color        = nColor(255, 255, 255);
@@ -98,7 +95,7 @@ end;
 
 function Library:New3DCube()
     local _cube = {
-        Visible      = false,
+        Visible      = false;
         ZIndex       = 1;
         Transparency = 1;
         Color        = nColor(255, 255, 255);
@@ -109,7 +106,7 @@ function Library:New3DCube()
         Size         = nVector3(0,0,0);
         Rotation     = nVector3(0,0,0);
     };
-    local _defaults  = _cube
+    local _defaults  = _cube;
     for f = 1, 6 do
         _cube["face"..tostring(f)] = nDrawing("Quad");
     end;
@@ -135,7 +132,7 @@ function Library:New3DCube()
             local pos = _cube.Position or _defaults.Position;
             local _rotCFrame = nCFrame(pos) * nCFAngles(rad(rot.X), rad(rot.Y), rad(rot.Z));
 
-            local _size = _cube.Size or _defaults.Size
+            local _size = _cube.Size or _defaults.Size;
             local _points = {
                 [1] = (_rotCFrame * nCFrame(_size.X, _size.Y, _size.Z)).p;
                 [2] = (_rotCFrame * nCFrame(_size.X, _size.Y, -_size.Z)).p;
@@ -151,7 +148,7 @@ function Library:New3DCube()
 
             for p = 1, #_points do
                 local _p, v = ToScreen(Camera, _points[p]);
-                local _stored = _points[p]
+                local _stored = _points[p];
                 _points[p] = nVector2(_p.x, _p.y);
 
                 if not v and not checkCamView(_stored) then 
@@ -217,7 +214,7 @@ end;
 
 function Library:New3DSquare()
     local _square = {
-        Visible      = false,
+        Visible      = false;
         ZIndex       = 1;
         Transparency = 1;
         Color        = nColor(255, 255, 255);
@@ -259,7 +256,7 @@ function Library:New3DSquare()
 
             for p = 1, #_points do
                 local _p, v = ToScreen(Camera, _points[p]);
-                local _stored = _points[p]
+                local _stored = _points[p];
                 _points[p] = nVector2(_p.x, _p.y);
 
                 if not v and not checkCamView(_stored) then 
@@ -280,14 +277,14 @@ function Library:New3DSquare()
     end;
     --------------------------
 
-    local step_Id = "3D_Square"..random_string(10)
-    RS:BindToRenderStep(step_Id, 1, _square.Update)
+    local step_Id = "3D_Square"..random_string(10);
+    RS:BindToRenderStep(step_Id, 1, _square.Update);
 
     -- Remove Square --
     function _square:Remove()
-        RS:UnbindFromRenderStep(step_Id)
+        RS:UnbindFromRenderStep(step_Id);
 
-        _square.square:Remove()
+        _square.square:Remove();
     end;
     -----------------
 
@@ -296,7 +293,7 @@ end;
 
 function Library:New3DCircle()
     local _circle = {
-        Visible      = false,
+        Visible      = false;
         ZIndex       = 1;
         Transparency = 1;
         Color        = nColor(255, 255, 255);
@@ -306,13 +303,13 @@ function Library:New3DCircle()
         Radius       = 10;
         Rotation     = nVector2(0,0);
     };
-    local _defaults = _circle
+    local _defaults = _circle;
     local _lines = {};
 
     local function makeNewLines(r)
         for l = 1, #_lines do
             _lines[l]:Remove();
-        end
+        end;
 
         _lines = {};
         
@@ -323,7 +320,7 @@ function Library:New3DCircle()
 
     -- Update Step Function --
     local previousR = _circle.Radius or _defaults.Radius;
-    makeNewLines(previousR)
+    makeNewLines(previousR);
 
     function _circle:Update()
         local rot = _circle.Rotation or _defaults.Rotation;
@@ -348,12 +345,12 @@ function Library:New3DCircle()
                     _lines[l].Color        = _circle.Color        or _defaults.Color;
                     _lines[l].Thickness    = _circle.Thickness    or _defaults.Thickness;
 
-                    local p1 = (_rotCFrame * nCFrame(0, 0, -_radius)).p
+                    local p1 = (_rotCFrame * nCFrame(0, 0, -_radius)).p;
                     local _previousPosition, v1 = ToScreen(Camera, p1);
 
                     _rotCFrame = _rotCFrame * nCFAngles(0, rad(_increm), 0);
 
-                    local p2 = (_rotCFrame * nCFrame(0, 0, -_radius)).p
+                    local p2 = (_rotCFrame * nCFrame(0, 0, -_radius)).p;
                     local _nextPosition, v2 = ToScreen(Camera, p2);
 
                     if (v1 and v2) or (checkCamView(p1) and checkCamView(p2)) then
@@ -370,8 +367,8 @@ function Library:New3DCircle()
     end;
     --------------------------
 
-    local step_Id = "3D_Circle"..random_string(10)
-    RS:BindToRenderStep(step_Id, 1, _circle.Update)
+    local step_Id = "3D_Circle"..random_string(10);
+    RS:BindToRenderStep(step_Id, 1, _circle.Update);
 
     -- Remove Circle --
     function _circle:Remove()
@@ -386,4 +383,4 @@ function Library:New3DCircle()
     return _circle;
 end;
 
-return Library
+return Library;
