@@ -1,9 +1,12 @@
 -- Made by Blissful#4992
 
 local DistFromCenter = 80
-local TriangleHeight = 14
-local TriangleWidth = 26
-local TriangleColor = Color3.fromRGB(255, 0, 0)
+local TriangleHeight = 16
+local TriangleWidth = 16
+local TriangleFilled = false
+local TriangleTransparency = 0
+local TriangleThickness = 2
+local TriangleColor = Color3.fromRGB(0, 255, 255)
 local AntiAliasing = false
 
 ----------------------------------------------------------------
@@ -51,8 +54,9 @@ local function DrawTriangle(color)
     local l = DRAWING("Triangle")
     l.Visible = false
     l.Color = color
-    l.Thickness = 2
-    l.Transparency = 1
+    l.Filled = TriangleFilled
+    l.Thickness = TriangleThickness
+    l.Transparency = 1-TriangleTransparency
     return l
 end
 local function AntiA(v)
