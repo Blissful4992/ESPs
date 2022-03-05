@@ -3,10 +3,10 @@
 local DistFromCenter = 80
 local TriangleHeight = 16
 local TriangleWidth = 16
-local TriangleFilled = false
+local TriangleFilled = true
 local TriangleTransparency = 0
-local TriangleThickness = 2
-local TriangleColor = Color3.fromRGB(0, 255, 255)
+local TriangleThickness = 1
+local TriangleColor = Color3.fromRGB(255, 255, 255)
 local AntiAliasing = false
 
 ----------------------------------------------------------------
@@ -31,8 +31,7 @@ local function GetRelative(pos, char)
 
     local rootP = char.PrimaryPart.Position
     local camP = Camera.CFrame.Position
-    camP = V3(camP.X, rootP.Y, camP.Z)
-    local newcf = CF(rootP, camP)
+    local newcf = CF(rootP, V3(camP.X, rootP.Y, camP.Z))
 
     local r = newcf:PointToObjectSpace(pos)
     
