@@ -31,11 +31,9 @@ local function GetRelative(pos, char)
 
     local rootP = char.PrimaryPart.Position
     local camP = Camera.CFrame.Position
-    local newcf = CF(V3(rootP.X, camP.Y, rootP.Z), camP)
+    local relative = CF(V3(rootP.X, camP.Y, rootP.Z), camP):PointToObjectSpace(pos)
 
-    local r = newcf:PointToObjectSpace(pos)
-    
-    return V2(r.X, r.Z)
+    return V2(relative.X, relative.Z)
 end
 
 local function RelativeToCenter(v)
