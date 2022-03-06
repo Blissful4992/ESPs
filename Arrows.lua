@@ -31,7 +31,7 @@ local function GetRelative(pos, char)
 
     local rootP = char.PrimaryPart.Position
     local camP = Camera.CFrame.Position
-    local newcf = CF(rootP, V3(camP.X, rootP.Y, camP.Z))
+    local newcf = CF(V3(rootP.X, camP.Y, rootP.Z), camP)
 
     local r = newcf:PointToObjectSpace(pos)
     
@@ -49,6 +49,7 @@ local function RotateVect(v, a)
 
     return V2(x, y)
 end
+
 local function DrawTriangle(color)
     local l = DRAWING("Triangle")
     l.Visible = false
@@ -58,6 +59,7 @@ local function DrawTriangle(color)
     l.Transparency = 1-TriangleTransparency
     return l
 end
+
 local function AntiA(v)
     if (not AntiAliasing) then return v end
     return V2(ROUND(v.x), ROUND(v.y))
