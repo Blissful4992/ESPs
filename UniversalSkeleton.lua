@@ -9,8 +9,11 @@ local RS = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
 local To2D = Camera.WorldToViewportPoint
 
-local Library = { Players = {} }
+-- Only thing for now is Skeleton
+local Library = {};
+Library.__index = Library;
 
+-- Functions
 function Library:NewLine()
     local l = Drawing.new("Line")
     l.Visible = false
@@ -24,115 +27,147 @@ function Library:Smoothen(v)
     return V2(ROUND(v.X), ROUND(v.Y))
 end
 
-function Library:NewSkeleton(Player)
-    local Player_Name = Player.Name
-    local Skeleton = { Destroyed = false; Visible = false; Lines = {}; Bind = Player_Name }
+-- Skeleton Object
+local Skeleton = {
+    Destroyed = false;
+    Visible = false;
+    Lines = {};
+    Player = nil;
+}
+Skeleton.__index = Skeleton;
 
-    TBINSERT(self.Players, Player_Name)
+function Skeleton:UpdateStructure()
+    if not self.Player.Character then return end
 
-    function Skeleton.UpdateStructure()
-        if not Player.Character then return end
+    self:DestroyLines()
 
-        Skeleton.DestroyLines()
-
-        local Body = Player.Character:GetChildren()
-        for n = 1, #Body do
-            local root = Body[n]
-            if root:IsA("BasePart") then
-                local next = root:FindFirstChildOfClass("Motor6D")
-                if next then
-                    TBINSERT(Skeleton.Lines, {self:NewLine(), root.Name, next.Part0.Name})
-                end
+    local Body = self.Player.Character:GetChildren()
+    for n = 1, #Body do
+        local root = Body[n]
+        if root:IsA("BasePart") then
+            local next = root:FindFirstChildOfClass("Motor6D")
+            if next then
+                TBINSERT(self.Lines, {Library:NewLine(), root.Name, next.Part0.Name})
             end
         end
     end
+end
 
-    function Skeleton.LineVis(state)
-        for _,l in pairs(Skeleton.Lines) do
-            l[1].Visible = state
-        end
+function Skeleton:SetVisible(state)
+    for _,l in pairs(self.Lines) do
+        l[1].Visible = state
+    end
+end
+
+-- Main Update Loop
+function Skeleton:Update()
+    if self.Destroyed then
+        RS:UnbindFromRenderStep(self.Bind)
     end
 
-    function Skeleton.Update()
-        if (Skeleton.Destroyed) then
-            RS:UnbindFromRenderStep(Skeleton.Bind)
-        end
+    local Character = self.Player.Character
+    local Humanoid = (Character and Character:FindFirstChildOfClass("Humanoid"))
 
-        local Character = Player.Character
-        local Humanoid = (Character and Character:FindFirstChildOfClass("Humanoid"))
+    if (Character) then
+        if not Humanoid or Humanoid.Health == 0 then self:SetVisible(false) end
 
-        if (Character) then
-            if not Humanoid or Humanoid.Health == 0 then Skeleton.LineVis(false) end
+        for _,l in pairs(self.Lines) do
+            local root = Character:FindFirstChild(l[2])
+            if root then
 
-            for _,l in pairs(Skeleton.Lines) do
-                local root = Character:FindFirstChild(l[2])
-                if root then
+                local next = Character:FindFirstChild(l[3])
+                if next and next ~= Character.PrimaryPart then
 
-                    local next = Character:FindFirstChild(l[3])
-                    if next  and next ~= Character.PrimaryPart then
+                    local rootp, rootv = To2D(Camera, root.Position)
+                    local nextp, nextv = To2D(Camera, next.Position)
+                
+                    if rootv and nextv then
+                        l[1].From = V2(rootp.X, rootp.Y)
+                        l[1].To = V2(nextp.X, nextp.Y)
 
-                        local rootp, rootv = To2D(Camera, root.Position)
-                        local nextp, nextv = To2D(Camera, next.Position)
-                    
-                        if rootv and nextv then
-                            l[1].From = V2(rootp.X, rootp.Y)
-                            l[1].To = V2(nextp.X, nextp.Y)
-
-                            l[1].Visible = true
-                        else 
-                            l[1].Visible = false
-                        end
+                        l[1].Visible = true
                     else 
                         l[1].Visible = false
                     end
                 else 
                     l[1].Visible = false
                 end
+            else 
+                l[1].Visible = false
             end
-
-        else
-            if not Player.Parent then
-                Skeleton.Destroy()
-                RS:UnbindFromRenderStep(Skeleton.Bind)
-            end
-            Skeleton.LineVis(false)
         end
-    end
-    
-    function Skeleton.Toggle()
-        Skeleton.Visible = not Skeleton.Visible
 
-        if Skeleton.Visible then 
-            Skeleton.DestroyLines()
-            Skeleton.UpdateStructure()
-            RS:BindToRenderStep(Skeleton.Bind, 1, Skeleton.Update)
-        else
-            RS:UnbindFromRenderStep(Skeleton.Bind)
-            Skeleton.LineVis(false)
+    else
+        if not self.Player.Parent then
+            self:Destroy()
+            RS:UnbindFromRenderStep(self.Bind)
         end
+        self:SetVisible(false)
     end
-
-    function Skeleton.DestroyLines()
-        for _,l in pairs(Skeleton.Lines) do
-            l[1]:Remove()
-        end
-        Skeleton.Lines = {}
-    end
-
-    function Skeleton.Destroy()
-        Skeleton.Destroyed = true
-        Skeleton.DestroyLines()
-        Skeleton = {}
-        TBREMOVE(self.Players, TBFIND(self.Players, Player_Name))
-    end
-
-    --
-    Skeleton.Toggle()
-    --
-
-    return Skeleton
 end
 
--- _G.LocalSkel = Library:NewSkeleton(game.Players.LocalPlayer)
+function Skeleton:Toggle()
+    self.Visible = not self.Visible
 
-return Library;
+    if self.Visible then 
+        self:DestroyLines()
+        self:UpdateStructure()
+        
+        local c;c = RS.Heartbeat:Connect(function()
+            if not self.Visible then
+                self:SetVisible(false)
+                c:Disconnect()
+                return;
+            end
+
+            self:Update()
+        end)
+    end
+end
+
+function Skeleton:DestroyLines()
+    for _,l in pairs(self.Lines) do
+        l[1]:Remove()
+    end
+    self.Lines = {}
+end
+
+function Skeleton:Destroy()
+    self.Destroyed = true
+    self:DestroyLines()
+end
+
+-- Create Skeleton Function
+function Library:NewSkeleton(Player, Visible)
+    local s = setmetatable({}, Skeleton);
+
+    s.Player = Player;
+    s.Bind = Player.UserId;
+
+    if Visible then
+        s:Toggle();
+    end
+
+    return s;
+end
+
+-- LIBRARY FORMAT
+if true then
+    return Library;
+end
+
+-- TEST
+if false then
+    local Players = {}
+    for _, Player in next, game.Players:GetChildren() do
+        TBINSERT(Players, Library:NewSkeleton(Player, true))
+    end
+    
+    while true do
+        local i = math.random(#Players)
+        print(Players[i].Player)
+        Players[i]:Toggle()
+    
+        task.wait(1)
+    end
+end
