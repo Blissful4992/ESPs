@@ -29,7 +29,7 @@ end
 
 -- Skeleton Object
 local Skeleton = {
-    Destroyed = false;
+    Removed = false;
 	Player = nil;
     Visible = false;
     Lines = {};
@@ -43,7 +43,7 @@ Skeleton.__index = Skeleton;
 function Skeleton:UpdateStructure()
     if not self.Player.Character then return end
 
-    self:DestroyLines();
+    self:RemoveLines();
 
     for _, part in next, self.Player.Character:GetChildren() do		
         if not part:IsA("BasePart") then
@@ -114,7 +114,7 @@ end
 
 -- Main Update Loop
 function Skeleton:Update()
-    if self.Destroyed then
+    if self.Removed then
 		return;
     end
 
@@ -125,7 +125,7 @@ function Skeleton:Update()
 		if self.Player.Parent then
 			self:SetVisible(false);
 		else
-            self:Destroy();
+            self:Remove();
         end
 		return;
     end
@@ -211,7 +211,7 @@ function Skeleton:Toggle()
     self.Visible = not self.Visible;
 
     if self.Visible then 
-        self:DestroyLines();
+        self:RemoveLines();
         self:UpdateStructure();
         
         local c;c = RS.Heartbeat:Connect(function()
@@ -226,7 +226,7 @@ function Skeleton:Toggle()
     end
 end
 
-function Skeleton:DestroyLines()
+function Skeleton:RemoveLines()
     for _,l in pairs(self.Lines) do
         l[1]:Remove();
 		l[2]:Remove();
@@ -234,9 +234,9 @@ function Skeleton:DestroyLines()
     self.Lines = {};
 end
 
-function Skeleton:Destroy()
-    self.Destroyed = true;
-    self:DestroyLines();
+function Skeleton:Remove()
+    self.Removed = true;
+    self:RemoveLines();
 end
 
 -- Create Skeleton Function
