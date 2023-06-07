@@ -108,6 +108,10 @@ function Skeleton:SetThickness(Thickness)
     end
 end
 
+function Skeleton:SetDoSubsteps(State)
+	self.DoSubsteps = State;
+end
+
 -- Main Update Loop
 function Skeleton:Update()
     if self.Destroyed then
