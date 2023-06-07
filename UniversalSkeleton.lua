@@ -250,6 +250,11 @@ function Library:NewSkeleton(Player, Visible, Color, Alpha, Thickness, DoSubstep
 
     s.Player = Player;
     s.Bind = Player.UserId;
+
+	Player.CharacterAdded:Connect(function(Character)
+		task.wait()
+		s:UpdateStructure()
+	end)
 	
 	if DoSubsteps ~= nil then
 		s.DoSubsteps = DoSubsteps;
