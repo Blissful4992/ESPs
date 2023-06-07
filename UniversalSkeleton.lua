@@ -36,6 +36,7 @@ local Skeleton = {
 	Color = Color3.fromRGB(0,255,0);
 	Alpha = 1;
 	Thickness = 1;
+	DoSubsteps = true;
 }
 Skeleton.__index = Skeleton;
 
@@ -44,27 +45,42 @@ function Skeleton:UpdateStructure()
 
     self:DestroyLines();
 
-    local Body = self.Player.Character:GetChildren()
-    for n = 1, #Body do
-        local root = Body[n];
-        if root:IsA("BasePart") then
-            local next = root:FindFirstChildOfClass("Motor6D")
-            if next then
-                TBINSERT(self.Lines, {Library:NewLine({
-					Visible = self.Visible;
-					Color = self.Color;
-					Transparency = self.Alpha;
-					Thickness = self.Thickness;
-				}), root.Name, next.Part0.Name});
-            end
+    for _, part in next, self.Player.Character:GetChildren() do		
+        if not part:IsA("BasePart") then
+			continue;
         end
+
+		for _, link in next, part:GetChildren() do			
+			if not link:IsA("Motor6D") then
+				continue;
+			end
+			
+			TBINSERT(
+				self.Lines,
+				{
+					Library:NewLine({
+						Visible = self.Visible;
+						Color = self.Color;
+						Transparency = self.Alpha;
+						Thickness = self.Thickness;
+					}),
+					Library:NewLine({
+						Visible = self.Visible;
+						Color = self.Color;
+						Transparency = self.Alpha;
+						Thickness = self.Thickness;
+					}),
+					link
+				}
+			);
+		end
     end
 end
 
 function Skeleton:SetVisible(State)
-	self.Visible = State;
     for _,l in pairs(self.Lines) do
         l[1].Visible = State;
+		l[2].Visible = State;
     end
 end
 
@@ -72,6 +88,7 @@ function Skeleton:SetColor(Color)
 	self.Color = Color;
     for _,l in pairs(self.Lines) do
         l[1].Color = Color;
+		l[2].Color = Color;
     end
 end
 
@@ -79,6 +96,7 @@ function Skeleton:SetAlpha(Alpha)
 	self.Alpha = Alpha;
     for _,l in pairs(self.Lines) do
         l[1].Transparency = Alpha;
+		l[2].Transparency = Alpha;
     end
 end
 
@@ -86,6 +104,7 @@ function Skeleton:SetThickness(Thickness)
 	self.Thickness = Thickness;
     for _,l in pairs(self.Lines) do
         l[1].Thickness = Thickness;
+		l[2].Thickness = Thickness;
     end
 end
 
@@ -116,29 +135,70 @@ function Skeleton:Update()
 	self:SetAlpha(self.Alpha);
 	self:SetThickness(self.Thickness);
 
-	for _,l in pairs(self.Lines) do
-		local root = Character:FindFirstChild(l[2]);
-		if root then
-
-			local next = Character:FindFirstChild(l[3])
-			if next and next ~= Character.PrimaryPart then
-
-				local rootp, rootv = To2D(Camera, root.Position);
-				local nextp, nextv = To2D(Camera, next.Position);
+	for _, l in pairs(self.Lines) do
+		local link = l[3]
+		if not link then
+			continue;
+		end
+		
+		local part0 = link.Part0;
+		local c0 = link.C0;
+		
+		if part0 and c0 then
+		
+			local part1 = link.Part1;
+			local c1 = link.C1;
 			
-				if rootv and nextv then
-					l[1].From = V2(rootp.X, rootp.Y);
-					l[1].To = V2(nextp.X, nextp.Y);
+			if part1 and c1 then
+				
+				if self.DoSubsteps then
+					-- Center of part0 to c0
+					local part0p, v1 = To2D(Camera, part0.CFrame.p);
+					local part0cp, v2 = To2D(Camera, (part0.CFrame * c0).p);
+					
+					if v1 and v2 then
+						l[1].From = V2(part0p.x, part0p.y);
+						l[1].To = V2(part0cp.x, part0cp.y);
 
-					l[1].Visible = true;
-				else 
-					l[1].Visible = false;
+						l[1].Visible = true;
+					else 
+						l[1].Visible = false;
+					end
+					
+					-- Center of part1 to c1
+					local part1p, v3 = To2D(Camera, part1.CFrame.p);
+					local part1cp, v4 = To2D(Camera, (part1.CFrame * c1).p);
+				
+					if v3 and v4 then
+						l[2].From = V2(part1p.x, part1p.y);
+						l[2].To = V2(part1cp.x, part1cp.y);
+
+						l[2].Visible = true;
+					else 
+						l[2].Visible = false;
+					end
+				else					
+					local part0p, v1 = To2D(Camera, part0.CFrame.p);
+					local part1p, v2 = To2D(Camera, part1.CFrame.p);
+					
+					if v1 and v2 then
+						l[1].From = V2(part0p.x, part0p.y);
+						l[1].To = V2(part1p.x, part1p.y);
+
+						l[1].Visible = true;
+					else 
+						l[1].Visible = false;
+					end
+					
+					l[2].Visible = false;
 				end
 			else 
 				l[1].Visible = false;
+				l[2].Visible = false;
 			end
 		else 
 			l[1].Visible = false;
+			l[2].Visible = false;
 		end
 	end
 end
@@ -165,6 +225,7 @@ end
 function Skeleton:DestroyLines()
     for _,l in pairs(self.Lines) do
         l[1]:Remove();
+		l[2]:Remove();
     end
     self.Lines = {};
 end
@@ -175,11 +236,19 @@ function Skeleton:Destroy()
 end
 
 -- Create Skeleton Function
-function Library:NewSkeleton(Player, Visible, Color, Alpha, Thickness)
+function Library:NewSkeleton(Player, Visible, Color, Alpha, Thickness, DoSubsteps)
+	if not Player then
+		error("Missing Player argument (#1)")
+	end
+	
     local s = setmetatable({}, Skeleton);
 
     s.Player = Player;
     s.Bind = Player.UserId;
+	
+	if DoSubsteps ~= nil then
+		s.DoSubsteps = DoSubsteps;
+	end
 	
 	if Color then
 		s:SetColor(Color)
@@ -201,27 +270,29 @@ function Library:NewSkeleton(Player, Visible, Color, Alpha, Thickness)
 end
 
 -- LIBRARY FORMAT
-if false then
+if true then
     return Library;
 end
 
 -- TEST
-if true then
-    local Players = {}
-    for _, Player in next, game.Players:GetChildren() do
-        TBINSERT(Players, Library:NewSkeleton(Player, true));
-    end
-    
-    while true do
-        local i = math.random(#Players)
-		
-        print(Players[i].Player)
-		
-        Players[i]:Toggle()
-		Players[i]:SetColor(Color3.fromRGB(math.random(255),math.random(255),math.random(255)))
-		Players[i]:SetAlpha(math.random())
-		Players[i]:SetThickness(math.random(10))
-    
-        task.wait()
-    end
+if false then
+	-- local Library = loadstring(game:HttpGet("https://github.com/Blissful4992/ESPs/blob/main/UniversalSkeleton.lua"))()
+
+	local Skeletons = {}
+	for _, Player in next, game.Players:GetChildren() do
+		table.insert(Skeletons, Library:NewSkeleton(Player, true));
+	end
+	game.Players.PlayerAdded:Connect(function(Player)
+		table.insert(Skeletons, Library:NewSkeleton(Player, true));
+	end)
+
+	while true do
+		for _, s in next, Skeletons do
+			s:SetColor(Color3.fromRGB(math.random(255),math.random(255),math.random(255)))
+			s:SetAlpha(math.random())
+			s:SetThickness(math.random(10))
+		end
+
+		task.wait(1)
+	end
 end
