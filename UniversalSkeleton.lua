@@ -78,6 +78,7 @@ function Skeleton:UpdateStructure()
 end
 
 function Skeleton:SetVisible(State)
+	self.Visible = State;
     for _,l in pairs(self.Lines) do
         l[1].Visible = State;
 		l[2].Visible = State;
