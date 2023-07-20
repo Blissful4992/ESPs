@@ -340,7 +340,7 @@ function Library:New3DCircle()
             end;
         else
             for l = 1, #_lines do
-                if _lines[l] and rawget(_lines[l], "__OBJECT_EXISTS") then
+                if _lines[l] then
                     _lines[l].Visible      = _circle.Visible      or _defaults.Visible;
                     _lines[l].ZIndex       = _circle.ZIndex       or _defaults.ZIndex;
                     _lines[l].Transparency = _circle.Transparency or _defaults.Transparency;
