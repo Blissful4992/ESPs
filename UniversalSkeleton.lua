@@ -8,6 +8,7 @@ local ROUND = math.round
 local RS = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
 local To2D = Camera.WorldToViewportPoint
+local LocalPlayer = game.Players.LocalPlayer
 
 -- Only thing for now is Skeleton
 local Library = {};
@@ -287,17 +288,18 @@ if false then
 
 	local Skeletons = {}
 	for _, Player in next, game.Players:GetChildren() do
-		table.insert(Skeletons, Library:NewSkeleton(Player, true));
+		if Player ~= LocalPlayer then
+			table.insert(Skeletons, Library:NewSkeleton(Player, true));
+		end
 	end
 	game.Players.PlayerAdded:Connect(function(Player)
 		table.insert(Skeletons, Library:NewSkeleton(Player, true));
 	end)
 
 	while true do
-		for _, s in next, Skeletons do
-			s:SetColor(Color3.fromRGB(math.random(255),math.random(255),math.random(255)))
-			s:SetAlpha(math.random())
-			s:SetThickness(math.random(10))
+		for _, skeleton in next, Skeletons do
+			skeleton:SetColor(Color3.fromRGB(skeleton.Player.TeamColor == LocalPlayer.TeamColor and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)));
+			skeleton:SetThickness(4);
 		end
 
 		task.wait(1)
